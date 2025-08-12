@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+pyvenv.cfg
+Include/
+Lib/
+Scripts/
+bin/
+lib/
+lib64/
+share/
+venv/
+.env/
+
+# Environment & config
+.env
+
+# Databases & local storage
+instance/*.db
+*.sqlite3
+*.sqlite
+
+# Logs
+*.log
+
+# VS Code settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

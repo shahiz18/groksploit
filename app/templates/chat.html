@@ -1,0 +1,20 @@
+<!-- templates/chat.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <form id="chatForm" method="POST" action="{{ url_for('main.ask_chat') }}">
+    <div class="input-group mb-3">
+      <input name="user_input" class="form-control" placeholder="Ask Grok anything casually..." />
+      <button class="btn btn-info" type="submit">Send 💬</button>
+    </div>
+  </form>
+
+  {% if chat_response %}
+  <div class="card bg-info text-dark mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Grok Says:</h5>
+      <p>{{ chat_response }}</p>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}

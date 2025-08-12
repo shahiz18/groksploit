@@ -1,0 +1,82 @@
+<!-- templates/attack.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <!-- Target/Command Input -->
+  <form id="attackForm" method="POST" action="{{ url_for('main.ask_attack') }}">
+    <div class="input-group mb-3">
+      <input name="user_input" class="form-control" placeholder="Enter target or action (e.g., Scan 192.168.1.1)" />
+      <button class="btn btn-primary" type="submit">Ask Grok ▶️</button>
+    </div>
+  </form>
+
+<div id="outputArea"></div>
+  <!-- Grok Suggestion -->
+  {% if suggestion %}
+    <div class="card bg-secondary mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Grok Suggests:</h5>
+        <p><strong>Tool:</strong> {{ suggestion.tool }}</p>
+        <p><strong>Reason:</strong> {{ suggestion.reason }}</p>
+        <p><strong>Command:</strong> <code>{{ suggestion.command }}</code></p>
+
+        <!-- Approve / Reject -->
+        <form method="POST" action="{{ url_for('main.run_tool') }}">
+            <input type="hidden" name="tool" value="{{ suggestion.tool }}">
+            <input type="hidden" name="target" value="{{ target }}">
+            <input type="hidden" name="command" value="{{ suggestion.command }}">
+            <button class="btn btn-success me-2" type="submit" name="approve" value="yes">✅ Approve</button>
+            <button class="btn btn-danger me-2" type="submit" name="approve" value="no">❌ Reject</button>
+            <button class="btn btn-warning" type="button" onclick="enableEdit()">📝 Edit</button>
+        </form>
+
+            <!-- Hidden Edit Form -->
+        <form id="editForm" method="POST" action="{{ url_for('main.run_tool') }}" style="display:none; margin-top: 1rem;">
+            <input type="hidden" name="tool" value="{{ suggestion.tool }}">
+            <input type="hidden" name="target" value="{{ target }}">
+            <label>Edit Command:</label>
+            <input type="text" name="command" class="form-control my-2" value="{{ suggestion.command }}">
+            <button class="btn btn-primary" type="submit" name="approve" value="yes">▶️ Run Edited Command</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Execution Logs -->
+  <div class="card bg-light text-dark">
+    <div class="card-body">
+      <h5 class="card-title">📋 Execution Log</h5>
+      {% for log in logs %}
+        <div class="mb-3 border-bottom pb-2">
+          <strong>[{{ log.timestamp }}]</strong> – <code>{{ log.command }}</code><br>
+          <pre>{{ log.output_data[:300] }}{% if log.output_data|length > 300 %}...{% endif %}</pre>
+        </div>
+      {% else %}
+        <p class="text-muted">No logs yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Grok Memory -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <strong>🧠 Current Grok Memory</strong>
+    </div>
+    <div class="card-body">
+      <pre>{{ memory|tojson(indent=2) }}</pre>
+    </div>
+  </div>
+
+  <!-- Edit Grok Memory -->
+  <form action="/update_memory" method="POST">
+    <div class="card mt-4">
+      <div class="card-header">
+        <strong>✍️ Edit Grok Memory</strong>
+      </div>
+      <div class="card-body">
+        <textarea name="edited_memory" rows="10" class="form-control" spellcheck="false">{{ memory|tojson(indent=2) }}</textarea>
+        <button type="submit" class="btn btn-warning mt-3">Update Memory</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}
